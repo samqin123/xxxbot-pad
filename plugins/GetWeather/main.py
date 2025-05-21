@@ -107,8 +107,16 @@ class GetWeather(PluginBase):
             
         self.logger.info(f"插件 {self.name} v{self.version} 初始化完成")
 
+        # 初始化token
+        self._current_token = None
+        self.generate_jwt_token()
+
     def generate_jwt_token(self):
         """生成JWT token"""
+        # 如果已经有token，直接返回
+        if self._current_token:
+            return self._current_token
+        
         try:
             # 构建payload
             payload = {
@@ -133,6 +141,9 @@ class GetWeather(PluginBase):
             # 生成token
             token = jwt.encode(payload, self.private_key, algorithm='EdDSA', headers=headers)
             self.logger.info(f"生成的Token: {token}")
+            
+            # 保存token
+            self._current_token = token
             return token
             
         except Exception as e:
